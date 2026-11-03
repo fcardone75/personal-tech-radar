@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import projects from '../../src/data/projects.json';
+import radarIt from '../../src/data/radar.it.json';
 import radar from '../../src/data/radar.json';
-import { validateRadarData } from '../../src/data/validate';
+import { validateRadarData, validateTranslation } from '../../src/data/validate';
+import { localize } from '../../src/i18n/locale';
 
 const clone = <T>(value: T): T => structuredClone(value);
 const firstEntry = () => clone(radar.entries[0]);
@@ -55,5 +57,33 @@ describe('validateRadarData', () => {
 
   it('rejects an empty radar', () => {
     expect(validateRadarData({ edition: '2026.11', entries: [] }, projects)).not.toEqual([]);
+  });
+});
+
+describe('Italian translation', () => {
+  it('covers every entry and project', () => {
+    expect(validateTranslation(radarIt, radar, projects)).toEqual([]);
+  });
+
+  it('reports a missing entry and an unknown one', () => {
+    const entries: Record<string, string> = { ...radarIt.entries, ghost: 'Non esiste.' };
+    delete entries[radar.entries[0].id];
+    const errors = validateTranslation({ ...radarIt, entries }, radar, projects).join('\n');
+    expect(errors).toMatch(new RegExp(`"${radar.entries[0].id}": missing`));
+    expect(errors).toMatch(/"ghost": no such entry/);
+  });
+
+  it('localizes data, and keeps "years: null" null', () => {
+    const it = localize('it');
+    const entry = radar.entries[0] as Parameters<typeof it.why>[0];
+    expect(it.why(entry)).toBe(radarIt.entries[entry.id as keyof typeof radarIt.entries]);
+    const undated = projects.find((p) => p.years === null);
+    if (undated) expect(it.project(undated).years).toBeNull();
+    expect(localize('en').why(entry)).toBe(entry.why);
+  });
+
+  it('formats months per language', () => {
+    expect(localize('en').month('2026-11')).toBe('Nov 2026');
+    expect(localize('it').month('2026-11')).toBe('nov 2026');
   });
 });

@@ -1,0 +1,95 @@
+{
+  "entries": {
+    "gitops": "Git è l'unico modo per modificare un cluster. Oltre 30 app ArgoCD, nessun drift.",
+    "rebac": "I ruoli non scalano nei prodotti multi-tenant. Le relazioni sì.",
+    "multi-tenancy-by-design": "L'isolamento dei tenant è una decisione architetturale, verificata in security review.",
+    "database-per-service": "Ownership chiara. I servizi si integrano tramite eventi, non con tabelle condivise.",
+    "event-driven-integration": "Un broker disaccoppia i servizi e i job di lunga durata.",
+    "quality-gates": "~3.000 test, copertura ≥90%. La CI blocca il merge.",
+    "infrastructure-as-code": "Terraform con stato remoto. La console cloud è in sola lettura.",
+    "finops-scheduling": "Lo spegnimento fuori orario ha ridotto del 63% il costo di calcolo dei cluster.",
+    "metadata-driven-models": "Nuove tabelle regolamentari senza un nuovo rilascio.",
+    "dimensional-modelling": "Ancora il modo più chiaro per servire la reportistica.",
+    "incremental-summarization": "Documenti lunghi su hardware solo CPU.",
+    "air-gapped-ai": "Modelli, aggiornamenti e audit senza accesso a Internet.",
+    "on-chain-notarization": "Hash JCS + SHA-256 su Algorand, verificabile pubblicamente.",
+    "rag-self-hosted": "Assistenti che non inviano mai dati a terzi.",
+    "ai-coding-agents": "Un'accelerazione reale. A giudicare restano i quality gate.",
+    "ai-act-by-design": "La normativa come vincolo architetturale, non come ripensamento.",
+    "shared-database": "Crea un monolite distribuito.",
+    "clickops": "Non riproducibile, non verificabile.",
+    "kubernetes": "Il mio runtime di default per tutto ciò che ha più di un servizio.",
+    "aks": "Migrato da East US a Italy North senza perdita di dati.",
+    "istio": "Zero trust tra i servizi senza toccare il codice applicativo.",
+    "argocd": "Il motore GitOps di cui mi fido in produzione.",
+    "terraform": "Un solo linguaggio per tutte le risorse cloud.",
+    "keycloak": "Identità standard, federata anche con LDAP.",
+    "openfga": "Autorizzazione in stile Zanzibar come servizio.",
+    "envoy-ext-authz": "Autorizzazione al confine di ogni servizio.",
+    "keda": "Autoscaling guidato dagli eventi.",
+    "sealed-secrets": "I segreti vivono in Git, cifrati.",
+    "rabbitmq": "Messaggistica noiosa e affidabile.",
+    "minio": "API S3 ovunque, anche on-prem.",
+    "docker": "L'unità di rilascio.",
+    "github-actions": "CI con quality gate vicino al codice.",
+    "azure-devops-pipelines": "Va bene dove il cliente la usa già.",
+    "traefik": "Ingress semplice per installazioni on-prem a singolo host.",
+    "hetzner-lightweight-kubernetes": "Per piccoli SaaS: pieno controllo con meno di 30 €/mese.",
+    "algorand": "Notarizzazione pubblica economica e veloce.",
+    "lorawan": "Sensori a basso consumo in interi edifici.",
+    "whatsapp-business-api": "Gli utenti lo adorano. Il costo per messaggio va tenuto d'occhio.",
+    "docker-swarm": "Ha vinto Kubernetes. Solo legacy.",
+    "sharepoint-on-prem": "Pesante da evolvere e da gestire.",
+    "typescript": "Un unico sistema di tipi dalle API alla UI.",
+    "nodejs": "Oltre 20 microservizi in produzione.",
+    "hono": "Piccolo, veloce, basato sugli standard.",
+    "python": "Il linguaggio dell'AI e dei job sui dati.",
+    "fastapi": "API tipizzate con poca cerimonia.",
+    "celery": "I job AI lunghi fuori dal ciclo della richiesta.",
+    "react": "La mia scelta di default per le UI di prodotto.",
+    "tanstack": "Lo stato lato server gestito come si deve.",
+    "pwa": "Un'app installabile senza passare dagli store.",
+    "java-spring-boot": "Ancora la mia scelta per backend regolamentari ad alta intensità di dati.",
+    "sql": "Logica di business vicino ai dati, quando è lì che deve stare.",
+    "rust": "Sidecar di autorizzazione: piccolo, veloce, sicuro.",
+    "fastify": "Una buona alternativa a Hono per servizi solo Node.",
+    "redux-toolkit": "Nei nuovi progetti lo stato lato server spetta a TanStack Query.",
+    "j2ee-ejb": "Spring Boot fa lo stesso con meno peso.",
+    "gwt-gxt": "Un vicolo cieco per le UI web.",
+    "aspnet-webforms": "Solo legacy.",
+    "postgresql": "Il mio database di default.",
+    "redis": "Code, cache, stato di breve durata.",
+    "elasticsearch": "Ricerca e analisi dei log.",
+    "sql-server": "Forte nei data warehouse enterprise.",
+    "mongodb": "Solo dove i documenti si adattano davvero meglio delle tabelle.",
+    "whisper": "Speech-to-text offline affidabile.",
+    "xapi-scorm-cmi5": "Interoperabilità per l'e-learning.",
+    "nvidia-nemo": "Modelli offline di riconoscimento vocale e traduzione.",
+    "pytorch-inference": "Serving dei modelli senza GPU.",
+    "ollama": "Il modo più semplice per eseguire LLM in locale.",
+    "open-badges-edc": "Credenziali verificabili e portabili.",
+    "oracle-odi-etl": "Sostituito da pipeline code-first."
+  },
+  "projects": {
+    "saas": {
+      "description": "SaaS multi-tenant su Azure per data vault cifrati, con controllo degli accessi ReBAC (OpenFGA + sidecar Envoy) e audit log firmati. Guido il team di 6 persone.",
+      "years": "2022 – oggi"
+    },
+    "babel": {
+      "description": "Una piattaforma AI on-prem air-gapped, solo CPU, per un cliente istituzionale."
+    },
+    "bc4e": {
+      "description": "Una piattaforma multi-tenant di e-learning e peer assessment."
+    },
+    "pass": {
+      "description": "Una piattaforma di segnalazioni di vigilanza per i fondi pensione."
+    },
+    "keq": {
+      "description": "Il mio SaaS per le scuole di equitazione."
+    },
+    "daria": {
+      "description": "Una piattaforma IoT per la qualità dell'aria indoor.",
+      "years": "In progettazione"
+    }
+  }
+}

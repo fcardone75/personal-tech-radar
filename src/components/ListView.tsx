@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { projectsById } from '../data';
-import { QUADRANTS, ringIndex, ringOf } from '../data/model';
+import { QUADRANTS, ringIndex } from '../data/model';
+import { useLocale } from '../i18n/LocaleContext';
+import type { Lang } from '../i18n/locale';
 import { pad2 } from '../radar/filters';
 import type { PlacedBlip } from '../radar/layout';
 import { MarkerIcon } from './BlipMarker';
@@ -18,22 +20,22 @@ interface Props {
   onSelect: (id: string) => void;
 }
 
-function compare(a: PlacedBlip, b: PlacedBlip, sort: Sort): number {
+function compare(a: PlacedBlip, b: PlacedBlip, sort: Sort, lang: Lang): number {
   const byNumber = a.number - b.number;
   let result = byNumber;
-  if (sort.key === 'name') result = a.entry.name.localeCompare(b.entry.name, 'en', { sensitivity: 'base' });
+  if (sort.key === 'name') result = a.entry.name.localeCompare(b.entry.name, lang, { sensitivity: 'base' });
   if (sort.key === 'ring') result = ringIndex(a.entry.ring) - ringIndex(b.entry.ring) || byNumber;
   return result * sort.direction;
 }
 
-const COLUMNS: Array<{ key: SortKey; label: string }> = [
-  { key: 'number', label: '#' },
-  { key: 'name', label: 'Technology' },
-  { key: 'ring', label: 'Ring' },
-];
-
 export default function ListView({ blips, matches, selectedId, onSelect }: Props) {
+  const { t, lang, why } = useLocale();
   const [sort, setSort] = useState<Sort>({ key: 'ring', direction: 1 });
+  const columns: Array<{ key: SortKey; label: string }> = [
+    { key: 'number', label: '#' },
+    { key: 'name', label: t.list.technology },
+    { key: 'ring', label: t.list.ring },
+  ];
 
   const toggleSort = (key: SortKey) =>
     setSort((current) => (current.key === key ? { key, direction: current.direction === 1 ? -1 : 1 } : { key, direction: 1 }));
@@ -44,12 +46,12 @@ export default function ListView({ blips, matches, selectedId, onSelect }: Props
   };
 
   return (
-    <div className="list-wrap" role="region" aria-label="All entries as a table" tabIndex={0}>
+    <div className="list-wrap" role="region" aria-label={t.list.label} tabIndex={0}>
       <table className="list-table">
-        <caption className="sr-only">All radar entries, grouped by quadrant. Sort by number, name or ring.</caption>
+        <caption className="sr-only">{t.list.caption}</caption>
         <thead>
           <tr>
-            {COLUMNS.map((column) => (
+            {columns.map((column) => (
               <th key={column.key} scope="col" aria-sort={ariaSort(column.key)} className={`col-${column.key}`}>
                 <button type="button" className="sort-button" onClick={() => toggleSort(column.key)}>
                   {column.label}
@@ -60,24 +62,24 @@ export default function ListView({ blips, matches, selectedId, onSelect }: Props
               </th>
             ))}
             <th scope="col" className="col-since">
-              Since
+              {t.list.since}
             </th>
             <th scope="col" className="col-used">
-              Used in
+              {t.list.usedIn}
             </th>
             <th scope="col" className="col-why">
-              Why
+              {t.list.why}
             </th>
           </tr>
         </thead>
         {QUADRANTS.map((quadrant, index) => {
-          const rows = blips.filter((b) => b.entry.quadrant === quadrant.id).sort((a, b) => compare(a, b, sort));
+          const rows = blips.filter((b) => b.entry.quadrant === quadrant.id).sort((a, b) => compare(a, b, sort, lang));
           return (
             <tbody key={quadrant.id}>
               <tr className="list-group">
                 <th scope="rowgroup" colSpan={6}>
                   <span className="legend-index">{pad2(index + 1)}</span>
-                  {quadrant.name}
+                  {t.quadrants[quadrant.id]}
                   <span className="list-group-count">{rows.length}</span>
                 </th>
               </tr>
@@ -102,13 +104,13 @@ export default function ListView({ blips, matches, selectedId, onSelect }: Props
                       {entry.movement !== 'none' && <MarkerIcon movement={entry.movement} ring={entry.ring} size={14} />}
                     </th>
                     <td className="col-ring">
-                      <span className={`ring-pill ring-${entry.ring}`}>{ringOf(entry.ring).name}</span>
+                      <span className={`ring-pill ring-${entry.ring}`}>{t.rings[entry.ring].name}</span>
                     </td>
                     <td className="col-since">{entry.since ?? '—'}</td>
                     <td className="col-used">
                       {entry.usedIn.length > 0 ? entry.usedIn.map((id) => projectsById.get(id)?.title ?? id).join(', ') : '—'}
                     </td>
-                    <td className="col-why">{entry.why}</td>
+                    <td className="col-why">{why(entry)}</td>
                   </tr>
                 );
               })}

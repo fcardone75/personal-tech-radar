@@ -1,5 +1,6 @@
 import { projectsById } from '../data';
-import { RINGS, quadrantOf, ringOf, type QuadrantId, type RadarEntry, type RingId } from '../data/model';
+import { RINGS, type QuadrantId, type RadarEntry, type RingId } from '../data/model';
+import type { Locale } from '../i18n/locale';
 import type { PlacedBlip } from './layout';
 
 export interface Filters {
@@ -13,16 +14,17 @@ export const NO_FILTERS: Filters = { query: '', quadrant: 'all', ring: 'all' };
 export const isFiltered = (filters: Filters): boolean =>
   filters.query.trim() !== '' || filters.quadrant !== 'all' || filters.ring !== 'all';
 
-export function matchesFilters(entry: RadarEntry, filters: Filters): boolean {
+/** Search runs on the text shown in the current language. */
+export function matchesFilters(entry: RadarEntry, filters: Filters, { t, why }: Pick<Locale, 't' | 'why'>): boolean {
   if (filters.quadrant !== 'all' && entry.quadrant !== filters.quadrant) return false;
   if (filters.ring !== 'all' && entry.ring !== filters.ring) return false;
   const query = filters.query.trim().toLowerCase();
   if (!query) return true;
   const haystack = [
     entry.name,
-    entry.why,
-    quadrantOf(entry.quadrant).name,
-    ringOf(entry.ring).name,
+    why(entry),
+    t.quadrants[entry.quadrant],
+    t.rings[entry.ring].name,
     ...entry.usedIn.map((id) => projectsById.get(id)?.title ?? ''),
   ]
     .join(' ')

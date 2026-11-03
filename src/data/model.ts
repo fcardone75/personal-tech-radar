@@ -1,26 +1,12 @@
 // Radar vocabulary. Order matters: it drives positions on the radar,
 // numbering, legends and sorting.
 
-export const QUADRANTS = [
-  { id: 'techniques', name: 'Techniques & Architecture' },
-  { id: 'platforms', name: 'Platforms & Infrastructure' },
-  { id: 'languages', name: 'Languages & Frameworks' },
-  { id: 'data-ai', name: 'Data & AI' },
-] as const;
+// Display names live in src/i18n/strings.ts, per language.
+export const QUADRANTS = [{ id: 'techniques' }, { id: 'platforms' }, { id: 'languages' }, { id: 'data-ai' }] as const;
 
-export const RINGS = [
-  { id: 'adopt', name: 'Adopt', help: 'Confident choice', description: 'My default. I use it in production and recommend it.' },
-  { id: 'trial', name: 'Trial', help: 'Experiment in practice', description: 'Used on real work. Still proving its fit.' },
-  { id: 'assess', name: 'Assess', help: 'Worth investigating', description: 'Promising. I study it before I bet on it.' },
-  { id: 'hold', name: 'Hold', help: 'Use with caution', description: 'I would not start something new with it.' },
-] as const;
+export const RINGS = [{ id: 'adopt' }, { id: 'trial' }, { id: 'assess' }, { id: 'hold' }] as const;
 
-export const MOVEMENTS = [
-  { id: 'none', name: 'No change' },
-  { id: 'new', name: 'New' },
-  { id: 'moved-in', name: 'Moved in' },
-  { id: 'moved-out', name: 'Moved out' },
-] as const;
+export const MOVEMENTS = [{ id: 'none' }, { id: 'new' }, { id: 'moved-in' }, { id: 'moved-out' }] as const;
 
 export type QuadrantId = (typeof QUADRANTS)[number]['id'];
 export type RingId = (typeof RINGS)[number]['id'];
@@ -52,6 +38,12 @@ export interface RadarData {
   pending?: PendingEntry[];
 }
 
+/** Italian copy for the data, keyed by entry and project id (radar.it.json). */
+export interface DataTranslation {
+  entries: Record<string, string>;
+  projects: Record<string, { description: string; years?: string }>;
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -64,6 +56,3 @@ export const RESERVED_IDS = ['top', 'main', 'radar', 'moves', 'projects', 'princ
 
 export const quadrantIndex = (id: QuadrantId) => QUADRANTS.findIndex((q) => q.id === id);
 export const ringIndex = (id: RingId) => RINGS.findIndex((r) => r.id === id);
-export const quadrantOf = (id: QuadrantId) => QUADRANTS[quadrantIndex(id)];
-export const ringOf = (id: RingId) => RINGS[ringIndex(id)];
-export const movementOf = (id: MovementId) => MOVEMENTS.find((m) => m.id === id) ?? MOVEMENTS[0];

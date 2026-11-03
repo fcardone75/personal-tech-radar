@@ -1,4 +1,5 @@
 import { RINGS, type QUADRANTS } from '../data/model';
+import { useLocale } from '../i18n/LocaleContext';
 import { pad2 } from '../radar/filters';
 import type { PlacedBlip } from '../radar/layout';
 import { MarkerIcon } from './BlipMarker';
@@ -15,6 +16,7 @@ interface Props {
 }
 
 export default function QuadrantLegend({ quadrant, index, blips, matches, selectedId, hoveredId, onSelect, onHover }: Props) {
+  const { t } = useLocale();
   const items = blips.filter((b) => b.entry.quadrant === quadrant.id);
   const headingId = `legend-${quadrant.id}`;
 
@@ -23,7 +25,7 @@ export default function QuadrantLegend({ quadrant, index, blips, matches, select
       <header className="legend-head">
         <h3 id={headingId}>
           <span className="legend-index">{pad2(index + 1)}</span>
-          {quadrant.name}
+          {t.quadrants[quadrant.id]}
         </h3>
         <span className="legend-total">{items.length}</span>
       </header>
@@ -34,7 +36,7 @@ export default function QuadrantLegend({ quadrant, index, blips, matches, select
           <div className="legend-group" key={ring.id}>
             <p className="legend-ring">
               <span className={`dot ring-bg-${ring.id}`} aria-hidden="true" />
-              {ring.name}
+              {t.rings[ring.id].name}
               <span className="legend-ring-count">{group.length}</span>
             </p>
             <ul className="legend-list">

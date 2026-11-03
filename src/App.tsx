@@ -9,6 +9,7 @@ import Principles from './components/Principles';
 import Projects from './components/Projects';
 import Stats from './components/Stats';
 import { radar } from './data';
+import { useLocale } from './i18n/LocaleContext';
 import { COMPACT_QUERY, prefersReducedMotion, useMediaQuery } from './hooks/useMediaQuery';
 import { NO_FILTERS, matchesFilters, type Filters } from './radar/filters';
 import { layoutRadar } from './radar/layout';
@@ -28,6 +29,7 @@ export default function App() {
   const [view, setView] = useState<View>('radar');
   const [filters, setFilters] = useState<Filters>(NO_FILTERS);
   const compact = useMediaQuery(COMPACT_QUERY);
+  const locale = useLocale();
 
   // The selected entry lives in the URL (#gitops), so it can be shared.
   useEffect(() => {
@@ -62,14 +64,14 @@ export default function App() {
   );
 
   const matches = useMemo(
-    () => new Set(BLIPS.filter((b) => matchesFilters(b.entry, filters)).map((b) => b.entry.id)),
-    [filters],
+    () => new Set(BLIPS.filter((b) => matchesFilters(b.entry, filters, locale)).map((b) => b.entry.id)),
+    [filters, locale],
   );
 
   return (
     <>
       <a className="skip-link" href="#radar">
-        Skip to the radar
+        {locale.t.skipLink}
       </a>
       <Header />
       <main id="main">

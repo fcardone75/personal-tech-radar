@@ -1,5 +1,6 @@
 import { useRef, type KeyboardEvent } from 'react';
-import { RINGS, quadrantOf, ringOf } from '../data/model';
+import { RINGS } from '../data/model';
+import { useLocale } from '../i18n/LocaleContext';
 import { GEOMETRY, type PlacedBlip } from '../radar/layout';
 import { BlipMarker, isTriangle } from './BlipMarker';
 
@@ -29,6 +30,7 @@ function numberOffset(blip: PlacedBlip): string {
 }
 
 export default function RadarChart({ blips, matches, selectedId, hoveredId, onSelect, onHover, onClear }: Props) {
+  const { t } = useLocale();
   const refs = useRef<Array<SVGGElement | null>>([]);
   const selectedIndex = blips.findIndex((b) => b.entry.id === selectedId);
   const tabStop = selectedIndex >= 0 ? selectedIndex : 0;
@@ -78,7 +80,7 @@ export default function RadarChart({ blips, matches, selectedId, hoveredId, onSe
         className="radar-svg"
         viewBox={`0 0 ${size} ${size}`}
         role="group"
-        aria-label={`Technology radar with ${blips.length} entries. Use the arrow keys to move between entries and Enter to open one.`}
+        aria-label={t.chart.label(blips.length)}
       >
         <g aria-hidden="true">
           {[...RING_LABELS].reverse().map(({ ring, outer }) => (
@@ -97,7 +99,7 @@ export default function RadarChart({ blips, matches, selectedId, hoveredId, onSe
                 dy="0.35em"
                 textAnchor="middle"
               >
-                {ring.name.toUpperCase()}
+                {t.rings[ring.id].name.toUpperCase()}
               </text>
             )),
           )}
@@ -120,7 +122,7 @@ export default function RadarChart({ blips, matches, selectedId, hoveredId, onSe
                 transform={`translate(${blip.x} ${blip.y})`}
                 role="button"
                 tabIndex={index === tabStop ? 0 : -1}
-                aria-label={`${blip.number}. ${entry.name}, ${ringOf(entry.ring).name}, ${quadrantOf(entry.quadrant).name}`}
+                aria-label={`${blip.number}. ${entry.name}, ${t.rings[entry.ring].name}, ${t.quadrants[entry.quadrant]}`}
                 aria-pressed={selected}
                 data-testid="blip"
                 data-id={entry.id}

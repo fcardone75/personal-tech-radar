@@ -1,4 +1,5 @@
-import { MOVEMENTS, ringOf } from '../data/model';
+import { MOVEMENTS } from '../data/model';
+import { useLocale } from '../i18n/LocaleContext';
 import type { PlacedBlip } from '../radar/layout';
 import { MarkerIcon } from './BlipMarker';
 import MovementKey from './MovementKey';
@@ -10,24 +11,22 @@ interface Props {
 }
 
 export default function Moves({ blips, edition, onSelect }: Props) {
+  const { t, why } = useLocale();
   const moved = blips.filter((b) => b.entry.movement !== 'none');
 
   return (
     <section id="moves" className="section moves" aria-labelledby="moves-title">
       <div className="container">
         <header className="section-head">
-          <p className="section-index">02 / Moves</p>
+          <p className="section-index">{t.moves.index}</p>
           <h2 id="moves-title">
-            Moves this edition<span className="accent">.</span>
+            {t.moves.title}<span className="accent">.</span>
           </h2>
         </header>
 
         {moved.length === 0 ? (
           <div className="moves-baseline">
-            <p>
-              Edition {edition} is the baseline: every entry starts here, so nothing has moved yet. From the next edition,
-              this section lists what is new and what moved, and why.
-            </p>
+            <p>{t.moves.baseline(edition)}</p>
             <MovementKey />
           </div>
         ) : (
@@ -38,7 +37,7 @@ export default function Moves({ blips, edition, onSelect }: Props) {
               <div key={movement.id} className="moves-group">
                 <h3 className="moves-group-title">
                   <MarkerIcon movement={movement.id} size={18} />
-                  {movement.name}
+                  {t.movements[movement.id]}
                   <span>{group.length}</span>
                 </h3>
                 <ul className="moves-grid">
@@ -49,8 +48,8 @@ export default function Moves({ blips, edition, onSelect }: Props) {
                           <span className={`legend-num ring-bg-${entry.ring}`}>{number}</span>
                           <strong>{entry.name}</strong>
                         </span>
-                        <span className={`ring-pill ring-${entry.ring}`}>{ringOf(entry.ring).name}</span>
-                        <span className="move-card-why">{entry.why}</span>
+                        <span className={`ring-pill ring-${entry.ring}`}>{t.rings[entry.ring].name}</span>
+                        <span className="move-card-why">{why(entry)}</span>
                       </button>
                     </li>
                   ))}

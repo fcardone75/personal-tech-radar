@@ -118,3 +118,41 @@ export function validateRadarData(radar: unknown, projects: unknown, now: Date =
 
   return errors;
 }
+
+/**
+ * The Italian copy (radar.it.json) must cover every published entry and every
+ * project, and nothing else, so a new entry cannot ship half translated.
+ */
+export function validateTranslation(translation: unknown, radar: unknown, projects: unknown): string[] {
+  if (!isObj(translation) || !isObj(translation.entries) || !isObj(translation.projects)) {
+    return ['translation: needs "entries" and "projects" objects'];
+  }
+  const errors: string[] = [];
+  const entries = isObj(radar) && Array.isArray(radar.entries) ? radar.entries.filter(isObj) : [];
+  const entryIds = new Set(entries.map((e) => e.id));
+  const projectList = Array.isArray(projects) ? projects.filter(isObj) : [];
+  const projectIds = new Set(projectList.map((p) => p.id));
+
+  for (const id of entryIds) {
+    const why = translation.entries[String(id)];
+    if (!isText(why)) errors.push(`translation.entries "${String(id)}": missing`);
+    else if (why.length > MAX_WHY) errors.push(`translation.entries "${String(id)}": keep it under ${MAX_WHY} characters`);
+  }
+  for (const id of Object.keys(translation.entries)) {
+    if (!entryIds.has(id)) errors.push(`translation.entries "${id}": no such entry`);
+  }
+
+  for (const project of projectList) {
+    const id = String(project.id);
+    const text = translation.projects[id];
+    if (!isObj(text) || !isText(text.description)) {
+      errors.push(`translation.projects "${id}".description: missing`);
+      continue;
+    }
+    if (text.years !== undefined && !isText(text.years)) errors.push(`translation.projects "${id}".years: text`);
+  }
+  for (const id of Object.keys(translation.projects)) {
+    if (!projectIds.has(id)) errors.push(`translation.projects "${id}": no such project`);
+  }
+  return errors;
+}

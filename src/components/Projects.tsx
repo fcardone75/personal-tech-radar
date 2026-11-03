@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { projects } from '../data';
 import { ringIndex, type Project } from '../data/model';
+import { useLocale } from '../i18n/LocaleContext';
 import type { PlacedBlip } from '../radar/layout';
 
 const VISIBLE_CHIPS = 10;
@@ -12,6 +13,7 @@ interface CardProps {
 }
 
 function ProjectCard({ project, entries, onSelect }: CardProps) {
+  const { t } = useLocale();
   const [expanded, setExpanded] = useState(false);
   const visible = expanded ? entries : entries.slice(0, VISIBLE_CHIPS);
   const listId = `project-${project.id}-entries`;
@@ -24,7 +26,7 @@ function ProjectCard({ project, entries, onSelect }: CardProps) {
       </header>
       <p className="project-description">{project.description}</p>
       <p className="project-count">
-        {entries.length} radar {entries.length === 1 ? 'entry' : 'entries'}
+        {t.projects.count(entries.length)}
       </p>
       <ul className="chip-list" id={listId}>
         {visible.map(({ entry, number }) => (
@@ -44,7 +46,7 @@ function ProjectCard({ project, entries, onSelect }: CardProps) {
           aria-controls={listId}
           onClick={() => setExpanded((value) => !value)}
         >
-          {expanded ? 'Show fewer' : `Show all ${entries.length}`}
+          {expanded ? t.projects.fewer : t.projects.all(entries.length)}
         </button>
       )}
     </article>
@@ -52,21 +54,22 @@ function ProjectCard({ project, entries, onSelect }: CardProps) {
 }
 
 export default function Projects({ blips, onSelect }: { blips: PlacedBlip[]; onSelect: (id: string) => void }) {
+  const { t, project: localizeProject } = useLocale();
   return (
     <section id="projects" className="section" aria-labelledby="projects-title">
       <div className="container">
         <header className="section-head">
-          <p className="section-index">03 / Evidence</p>
+          <p className="section-index">{t.projects.index}</p>
           <h2 id="projects-title">
-            Projects behind the radar<span className="accent">.</span>
+            {t.projects.title}<span className="accent">.</span>
           </h2>
-          <p className="section-lead">Every ring comes from real work. These are the projects, and what each one put on the radar.</p>
+          <p className="section-lead">{t.projects.lead}</p>
         </header>
         <div className="projects-grid">
           {projects.map((project) => (
             <ProjectCard
               key={project.id}
-              project={project}
+              project={localizeProject(project)}
               entries={blips
                 .filter((b) => b.entry.usedIn.includes(project.id))
                 .sort((a, b) => ringIndex(a.entry.ring) - ringIndex(b.entry.ring) || a.number - b.number)}

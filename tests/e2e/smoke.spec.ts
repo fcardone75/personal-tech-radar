@@ -64,3 +64,21 @@ test('the list view shows every entry', async ({ page }) => {
   await page.getByRole('button', { name: 'List', exact: true }).click();
   await expect(page.getByTestId('list-row')).toHaveCount(total);
 });
+
+test('the flags switch between English and Italian, and the choice is kept', async ({ page }) => {
+  const errors = collectErrors(page);
+  await page.goto('./');
+
+  await page.getByRole('button', { name: 'Italiano' }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('La tecnologia è una scelta.');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'it');
+  await expect(page.getByRole('button', { name: 'Italiano' })).toHaveAttribute('aria-pressed', 'true');
+
+  await page.reload();
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('La tecnologia è una scelta.');
+
+  await page.getByRole('button', { name: 'English' }).click();
+  await expect(page.getByRole('heading', { level: 1 })).toContainText('Technology is a choice.');
+  await expect(page.locator('html')).toHaveAttribute('lang', 'en');
+  expect(errors).toEqual([]);
+});

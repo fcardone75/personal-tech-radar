@@ -1,6 +1,7 @@
 import { useEffect, useRef, type KeyboardEvent } from 'react';
 import { projectsById } from '../data';
-import { RINGS, movementOf, quadrantOf, ringOf, type RingId } from '../data/model';
+import { RINGS, type RingId } from '../data/model';
+import { useLocale } from '../i18n/LocaleContext';
 import type { PlacedBlip } from '../radar/layout';
 import { MarkerIcon } from './BlipMarker';
 import { ChevronLeft, ChevronRight, Close } from './icons';
@@ -16,42 +17,37 @@ interface Props {
   onStep: (delta: number) => void;
 }
 
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-
-function formatMonth(value: string): string {
-  const [year, month] = value.split('-').map(Number);
-  return month ? `${MONTHS[month - 1]} ${year}` : value;
-}
-
 function HowToRead({ counts }: { counts: Record<RingId, number> }) {
+  const { t } = useLocale();
   return (
     <>
-      <p className="detail-kicker">Radar key</p>
-      <h3 className="detail-title is-key">How to read the rings</h3>
-      <p className="detail-lead">The ring is my recommendation, not my proficiency. Closer to the centre means I trust it more.</p>
+      <p className="detail-kicker">{t.detail.keyKicker}</p>
+      <h3 className="detail-title is-key">{t.detail.keyTitle}</h3>
+      <p className="detail-lead">{t.detail.keyLead}</p>
       <ol className="ring-key">
         {RINGS.map((ring) => (
           <li key={ring.id} className="ring-key-item">
             <span className={`ring-key-swatch ring-bg-${ring.id}`} aria-hidden="true" />
             <span className="ring-key-text">
-              <strong>{ring.name}</strong>
-              <span>{ring.help}</span>
-              <small>{ring.description}</small>
+              <strong>{t.rings[ring.id].name}</strong>
+              <span>{t.rings[ring.id].help}</span>
+              <small>{t.rings[ring.id].description}</small>
             </span>
-            <span className="ring-key-count" aria-label={`${counts[ring.id]} entries`}>
+            <span className="ring-key-count" aria-label={t.detail.keyCount(counts[ring.id])}>
               {counts[ring.id]}
             </span>
           </li>
         ))}
       </ol>
-      <p className="detail-subhead">Shape shows movement since the last edition</p>
+      <p className="detail-subhead">{t.detail.shapes}</p>
       <MovementKey />
-      <p className="detail-hint">Select a blip, or a name in the lists, to see why it sits where it does.</p>
+      <p className="detail-hint">{t.detail.hint}</p>
     </>
   );
 }
 
 export default function DetailPanel({ blip, total, counts, sheet, onClose, onStep }: Props) {
+  const { t, why, project, month } = useLocale();
   const panelRef = useRef<HTMLDivElement>(null);
   const open = blip !== null;
 
@@ -72,16 +68,15 @@ export default function DetailPanel({ blip, total, counts, sheet, onClose, onSte
 
   if (!blip) {
     return (
-      <aside className="detail" data-testid="detail-panel" aria-label="How to read the radar">
+      <aside className="detail" data-testid="detail-panel" aria-label={t.detail.keyLabel}>
         <HowToRead counts={counts} />
       </aside>
     );
   }
 
   const { entry, number } = blip;
-  const ring = ringOf(entry.ring);
-  const movement = movementOf(entry.movement);
-  const usedIn = entry.usedIn.map((id) => projectsById.get(id)).filter((p) => p !== undefined);
+  const ring = t.rings[entry.ring];
+  const usedIn = entry.usedIn.map((id) => projectsById.get(id)).filter((p) => p !== undefined).map(project);
 
   return (
     <>
@@ -101,16 +96,16 @@ export default function DetailPanel({ blip, total, counts, sheet, onClose, onSte
             <span className="detail-number">
               {number} / {total}
             </span>
-            {quadrantOf(entry.quadrant).name}
+            {t.quadrants[entry.quadrant]}
           </p>
           <div className="detail-actions">
-            <button type="button" className="icon-button" onClick={() => onStep(-1)} aria-label="Previous entry">
+            <button type="button" className="icon-button" onClick={() => onStep(-1)} aria-label={t.detail.previous}>
               <ChevronLeft />
             </button>
-            <button type="button" className="icon-button" onClick={() => onStep(1)} aria-label="Next entry">
+            <button type="button" className="icon-button" onClick={() => onStep(1)} aria-label={t.detail.next}>
               <ChevronRight />
             </button>
-            <button type="button" className="icon-button" onClick={onClose} aria-label="Close and show the radar key">
+            <button type="button" className="icon-button" onClick={onClose} aria-label={t.detail.close}>
               <Close />
             </button>
           </div>
@@ -127,7 +122,7 @@ export default function DetailPanel({ blip, total, counts, sheet, onClose, onSte
           </span>
           <span className="badge">
             <MarkerIcon movement={entry.movement} ring={entry.ring} size={14} />
-            {movement.name}
+            {t.movements[entry.movement]}
           </span>
         </div>
         <p className="detail-ring-help">
@@ -135,27 +130,27 @@ export default function DetailPanel({ blip, total, counts, sheet, onClose, onSte
         </p>
 
         <section className="detail-block" aria-labelledby="detail-why">
-          <h4 id="detail-why">Why</h4>
-          <p className="detail-why">{entry.why}</p>
+          <h4 id="detail-why">{t.detail.why}</h4>
+          <p className="detail-why">{why(entry)}</p>
         </section>
 
         <dl className="detail-facts">
           <div>
-            <dt>Since</dt>
+            <dt>{t.detail.since}</dt>
             <dd>{entry.since ?? '—'}</dd>
           </div>
           <div>
-            <dt>Last reviewed</dt>
-            <dd>{formatMonth(entry.lastReviewed)}</dd>
+            <dt>{t.detail.lastReviewed}</dt>
+            <dd>{month(entry.lastReviewed)}</dd>
           </div>
           <div>
-            <dt>Edition</dt>
+            <dt>{t.detail.edition}</dt>
             <dd>{entry.edition}</dd>
           </div>
         </dl>
 
         <section className="detail-block" aria-labelledby="detail-used">
-          <h4 id="detail-used">Used in</h4>
+          <h4 id="detail-used">{t.detail.usedIn}</h4>
           {usedIn.length > 0 ? (
             <ul className="chip-list">
               {usedIn.map((project) => (
@@ -167,11 +162,11 @@ export default function DetailPanel({ blip, total, counts, sheet, onClose, onSte
               ))}
             </ul>
           ) : (
-            <p className="detail-muted">Not tied to one of the listed projects.</p>
+            <p className="detail-muted">{t.detail.noProject}</p>
           )}
         </section>
 
-        <p className="detail-note">The ring is my recommendation, not my proficiency.</p>
+        <p className="detail-note">{t.detail.note}</p>
       </div>
     </>
   );

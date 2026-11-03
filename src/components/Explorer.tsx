@@ -1,4 +1,6 @@
-import { QUADRANTS, RINGS, quadrantOf, ringOf, type QuadrantId } from '../data/model';
+import { QUADRANTS, RINGS, type QuadrantId } from '../data/model';
+import { useLocale } from '../i18n/LocaleContext';
+import type { Strings } from '../i18n/strings';
 import { NO_FILTERS, isFiltered, pad2, ringCounts, type Filters } from '../radar/filters';
 import type { PlacedBlip } from '../radar/layout';
 import Controls, { type View } from './Controls';
@@ -31,26 +33,28 @@ interface QuadrantButtonProps {
 }
 
 function QuadrantButton({ quadrant, index, count, active, align, onToggle }: QuadrantButtonProps) {
+  const { t } = useLocale();
   return (
     <button type="button" className={`quad-label align-${align}`} aria-pressed={active} onClick={onToggle}>
       <span className="quad-label-index">{pad2(index + 1)}</span>
-      <span className="quad-label-name">{quadrant.name}</span>
-      <span className="quad-label-count">{count} entries</span>
+      <span className="quad-label-name">{t.quadrants[quadrant.id]}</span>
+      <span className="quad-label-count">{t.explorer.entries(count)}</span>
     </button>
   );
 }
 
-function emptyMessage(filters: Filters): string {
+function emptyMessage(filters: Filters, t: Strings): string {
   const parts: string[] = [];
-  if (filters.ring !== 'all') parts.push(ringOf(filters.ring).name);
-  if (filters.quadrant !== 'all') parts.push(quadrantOf(filters.quadrant).name);
-  const scope = parts.length > 0 ? ` in ${parts.join(' · ')}` : '';
+  if (filters.ring !== 'all') parts.push(t.rings[filters.ring].name);
+  if (filters.quadrant !== 'all') parts.push(t.quadrants[filters.quadrant]);
+  const scope = parts.length > 0 ? t.explorer.scope(parts.join(' · ')) : '';
   const query = filters.query.trim();
-  return query ? `No technologies match “${query}”${scope}.` : `No technologies${scope}.`;
+  return query ? t.explorer.noMatch(query, scope) : t.explorer.noEntries(scope);
 }
 
 export default function Explorer(props: Props) {
   const { blips, matches, filters, onFilters, view, onView, selectedId, hoveredId, onSelect, onHover, compact } = props;
+  const { t } = useLocale();
   const selectedIndex = blips.findIndex((b) => b.entry.id === selectedId);
   const selected = selectedIndex >= 0 ? blips[selectedIndex] : null;
   const counts = ringCounts(blips);
@@ -82,34 +86,31 @@ export default function Explorer(props: Props) {
     <section id="radar" className="section explorer-section" aria-labelledby="radar-title">
       <div className="container">
         <header className="section-head">
-          <p className="section-index">01 / Explore</p>
+          <p className="section-index">{t.explorer.index}</p>
           <h2 id="radar-title">
-            The radar<span className="accent">.</span>
+            {t.explorer.title}<span className="accent">.</span>
           </h2>
-          <p className="section-lead">
-            Four quadrants, four rings. Distance from the centre is my recommendation. Select a blip or a name to see why
-            it sits where it does.
-          </p>
+          <p className="section-lead">{t.explorer.lead}</p>
         </header>
 
         <Controls view={view} onView={onView} filters={filters} onFilters={onFilters} counts={counts} total={total} />
 
         <div className="result-line">
           <p aria-live="polite">
-            Showing <strong>{matches.size}</strong> of {total}
-            {filtered ? ' · filtered entries are dimmed' : ''}
+            {t.explorer.showing(matches.size, total)}
+            {filtered ? t.explorer.dimmed : ''}
           </p>
           {filtered && (
             <button type="button" className="link-button" onClick={() => onFilters(NO_FILTERS)}>
-              Clear filters
+              {t.explorer.clear}
             </button>
           )}
         </div>
         {matches.size === 0 && (
           <p className="empty" role="status">
-            {emptyMessage(filters)}{' '}
+            {emptyMessage(filters, t)}{' '}
             <button type="button" className="link-button" onClick={() => onFilters(NO_FILTERS)}>
-              Clear filters
+              {t.explorer.clear}
             </button>
           </p>
         )}
@@ -136,14 +137,14 @@ export default function Explorer(props: Props) {
                     {quadrantButton(2, 'start')}
                     {quadrantButton(3, 'end')}
                   </div>
-                  <ul className="radar-ring-key" aria-label="Rings, from the centre outwards">
+                  <ul className="radar-ring-key" aria-label={t.explorer.ringKeyLabel}>
                     {RINGS.map((ring) => (
                       <li key={ring.id}>
                         <span className={`dot ring-bg-${ring.id}`} aria-hidden="true" />
-                        {ring.name}
+                        {t.rings[ring.id].name}
                       </li>
                     ))}
-                    <li className="radar-ring-key-note">Rings from the centre outwards. Numbers are in the lists below.</li>
+                    <li className="radar-ring-key-note">{t.explorer.ringKeyNote}</li>
                   </ul>
                 </div>
                 <div className="legends">

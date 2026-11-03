@@ -1,5 +1,7 @@
 # Personal Technology Radar
 
+**English** · [Italiano](README.it.md)
+
 **See it live: [fcardone75.github.io/personal-tech-radar](https://fcardone75.github.io/personal-tech-radar/)**
 
 My personal technology radar: the techniques, platforms, languages and data/AI tools I use or have evaluated, where I place each one, and why. It is a record of engineering judgement, not a list of skills.

@@ -1,50 +1,15 @@
-import React,{useMemo,useState} from "react";
-import{createRoot}from"react-dom/client";
-import"./style.css";
-type Ring="Adopt"|"Trial"|"Assess"|"Hold";
-type Quadrant="Languages & Frameworks"|"Platforms & Infrastructure"|"Data & AI"|"Tools & Techniques";
-type Tech={name:string;ring:Ring;quadrant:Quadrant;experience:string;note:string};
-const quadrants:Quadrant[]=["Languages & Frameworks","Platforms & Infrastructure","Data & AI","Tools & Techniques"];
-const rings:Ring[]=["Adopt","Trial","Assess","Hold"];
-const colors:Record<Ring,string>={Adopt:"#45e3b0",Trial:"#79a9ff",Assess:"#ffc579",Hold:"#f38ea2"};
-const raw:[string,Ring,Quadrant,string,string][]=[
-["TypeScript","Adopt",quadrants[0],"Current","Typed frontend and backend development."],
-["React","Adopt",quadrants[0],"Current","Component-based user interfaces."],
-["Java / Spring Boot","Adopt",quadrants[0],"Current","Enterprise applications and services."],
-["Python","Adopt",quadrants[0],"Current","Automation, APIs and AI experiments."],
-["Angular","Trial",quadrants[0],"Previous","Frontend framework evaluated against project requirements."],
-["Kubernetes","Adopt",quadrants[1],"Current","Cloud-native orchestration."],
-["Docker","Adopt",quadrants[1],"Current","Containerized application delivery."],
-["Argo CD","Adopt",quadrants[1],"Current","Declarative GitOps deployments."],
-["Istio","Trial",quadrants[1],"Current","Service mesh with explicit operational trade-offs."],
-["Azure / AKS","Adopt",quadrants[1],"Current","Managed Kubernetes infrastructure."],
-["PostgreSQL","Adopt",quadrants[2],"Current","Relational persistence and SQL."],
-["MongoDB","Trial",quadrants[2],"Current","Document databases for suitable access patterns."],
-["Redis","Adopt",quadrants[2],"Current","Caching and asynchronous processing."],
-["Local LLMs","Trial",quadrants[2],"Exploring","Inference and agent experiments on local hardware."],
-["RAG","Assess",quadrants[2],"Exploring","Evaluating retrieval-augmented systems."],
-["GitOps","Adopt",quadrants[3],"Current","Versioned infrastructure and deployments."],
-["Keycloak","Adopt",quadrants[3],"Current","Identity and access management."],
-["OpenFGA","Trial",quadrants[3],"Current","Fine-grained relationship-based authorization."],
-["OPA","Trial",quadrants[3],"Current","Policy-as-code."],
-["CI/CD","Adopt",quadrants[3],"Current","Automated testing, builds and delivery."]
-];
-const data:Tech[]=raw.map(([name,ring,quadrant,experience,note])=>({name,ring,quadrant,experience,note}));
-const ringHelp:Record<Ring,string>={Adopt:"Confident choice",Trial:"Experiment in practice",Assess:"Worth investigating",Hold:"Use with caution"};
-function position(t:Tech){const q=quadrants.indexOf(t.quadrant),r=rings.indexOf(t.ring),group=data.filter(x=>x.quadrant===t.quadrant&&x.ring===t.ring),i=group.indexOf(t),n=group.length;const bounds:[[number,number],[number,number],[number,number],[number,number]]=[[25,81],[95,151],[165,221],[235,285]];const [lo,hi]=bounds[r];const radius=lo+(hi-lo)*(.25+(.65*((i*7)%Math.max(1,n))/Math.max(1,n)));const angle=(q*90+12+((i+.5)/n)*66)*Math.PI/180;return{x:320+radius*Math.cos(angle),y:320-radius*Math.sin(angle)}}
-function App(){
- const[query,setQuery]=useState("");const[ring,setRing]=useState<Ring|"All">("All");const[quadrant,setQuadrant]=useState<Quadrant|"All">("All");const[selected,setSelected]=useState<Tech|null>(null);const[view,setView]=useState<"radar"|"catalog">("radar");
- const visible=useMemo(()=>data.filter(t=>(ring==="All"||t.ring===ring)&&(quadrant==="All"||t.quadrant===quadrant)&&[t.name,t.quadrant,t.note].join(" ").toLowerCase().includes(query.toLowerCase())),[query,ring,quadrant]);
- return <main><nav className="nav"><a className="brand" href="#top"><span className="brandmark">FC<span>·</span></span><span>FLAVIANO CARDONE<small>ENGINEERING JOURNAL</small></span></a><div className="navlinks"><a href="#radar">Radar</a><a href="#principles">Principles</a><a href="https://github.com/fcardone75/personal-tech-radar" target="_blank" rel="noreferrer">GitHub ↗</a></div></nav>
- <header id="top"><div className="hero-copy"><span className="kicker"><span className="live"/> PERSONAL TECHNOLOGY RADAR <span className="version">/ 2026.11</span></span><h1>Technology is a choice.<br/><em>Not a checklist.</em></h1><p>My evolving perspective on the tools, platforms and ideas shaping how I build software. Built on experience, curiosity and engineering trade-offs.</p><div className="hero-actions"><a className="primary" href="#radar">Explore my radar <span>↗</span></a><a className="secondary" href="https://github.com/fcardone75/personal-tech-radar" target="_blank" rel="noreferrer">View repository ↗</a></div></div><div className="hero-visual" aria-hidden="true"><div className="orbit o1"/><div className="orbit o2"/><div className="orbit o3"/><div className="orbit o4"/><div className="hero-center">THINK<br/>BUILD<br/><b>EVOLVE</b></div><span className="satellite s1"/><span className="satellite s2"/><span className="satellite s3"/></div></header>
- <section className="metrics" aria-label="Radar summary"><div><strong>{data.length.toString().padStart(2,"0")}</strong><span>TECHNOLOGIES</span></div><div><strong>04</strong><span>QUADRANTS</span></div><div><strong>04</strong><span>ADOPTION RINGS</span></div><div><strong>∞</strong><span>ROOM TO LEARN</span></div></section>
- <section id="radar" className="workspace"><div className="section-head"><div><span className="section-index">01 / EXPLORE</span><h2>The radar<span className="accent">.</span></h2><p>Explore technologies by domain, recommendation and experience. Select any marker to learn more.</p></div><div className="view-switch"><button className={view==="radar"?"chosen":""} onClick={()=>setView("radar")}>◎ Radar</button><button className={view==="catalog"?"chosen":""} onClick={()=>setView("catalog")}>▦ List</button></div></div>
- <div className="controls"><label className="search"><span>⌕</span><input aria-label="Search technologies" placeholder="Search technologies..." value={query} onChange={e=>setQuery(e.target.value)}/></label><select aria-label="Filter quadrant" value={quadrant} onChange={e=>setQuadrant(e.target.value as Quadrant|"All")}><option value="All">All quadrants</option>{quadrants.map(q=><option key={q}>{q}</option>)}</select><div className="ring-filters">{(["All",...rings] as const).map(r=><button key={r} className={ring===r?"active":""} onClick={()=>setRing(r)}>{r}</button>)}</div></div>
- <div className="work-grid"><div className="visual-panel">{view==="radar"?<div className="radar-wrap"><svg viewBox="0 0 640 640" role="img" aria-label="Interactive technology radar. Select markers or use the technology list."><defs><radialGradient id="glow"><stop stopColor="#203a48" stopOpacity=".55"/><stop offset="1" stopColor="#0f192a" stopOpacity="0"/></radialGradient></defs><circle cx="320" cy="320" r="310" fill="url(#glow)"/>{[80,150,220,285].map((r,i)=><circle key={r} cx="320" cy="320" r={r} fill="none" stroke={i===3?"#41546a":"#2c3e53"} strokeWidth="1.3" strokeDasharray={i===3?"5 7":"none"}/>)}<path d="M320 35V605M35 320H605" stroke="#314358" strokeWidth="1"/><text x="475" y="42" className="quad-label" textAnchor="middle">LANGUAGES</text><text x="163" y="42" className="quad-label" textAnchor="middle">PLATFORMS</text><text x="163" y="609" className="quad-label" textAnchor="middle">DATA & AI</text><text x="475" y="609" className="quad-label" textAnchor="middle">TOOLS</text><circle cx="320" cy="320" r="8" fill="#45e3b0" opacity=".8"/>{visible.map(t=>{const p=position(t);return <g key={t.name} className="marker" role="button" tabIndex={0} aria-label={t.name} onClick={()=>setSelected(t)} onKeyDown={e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();setSelected(t)}}}><circle cx={p.x} cy={p.y} r="15" fill={colors[t.ring]} opacity=".12"/><circle cx={p.x} cy={p.y} r="7" fill={colors[t.ring]} stroke="#0d1727" strokeWidth="2"/><title>{t.name}</title></g>})}</svg><div className="radar-caption">SELECT A DOT TO EXPLORE <span>↗</span></div></div>:<div className="catalog">{visible.map(t=><button key={t.name} onClick={()=>setSelected(t)}><span className="catalog-dot" style={{background:colors[t.ring]}}/><span><b>{t.name}</b><small>{t.quadrant}</small></span><span className="catalog-ring">{t.ring}</span><span>↗</span></button>)}</div>}{visible.length===0&&<p className="empty">No technologies match these filters.</p>}</div>
- <aside className="side-panel"><div className="side-top"><span className="section-index">RADAR KEY</span><span className="count">{visible.length} / {data.length}</span></div><h3>Reading the rings</h3><p>The rings describe my current recommendation — not my proficiency. Experience is tracked separately.</p><div className="legend">{rings.map((r,i)=><button key={r} onClick={()=>setRing(ring===r?"All":r)} className={ring===r?"selected":""}><span className="legend-index">0{i+1}</span><i style={{background:colors[r]}}/><span><b>{r}</b><small>{ringHelp[r]}</small></span><span className="legend-count">{data.filter(t=>t.ring===r).length}</span></button>)}</div><div className="side-bottom"><h4>EXPLORE TECHNOLOGIES</h4><div className="tech-pills">{visible.map(t=><button key={t.name} onClick={()=>setSelected(t)}><i style={{background:colors[t.ring]}}/>{t.name}</button>)}</div></div></aside></div></section>
- <section id="principles" className="principles"><span className="section-index">02 / HOW I THINK</span><h2>Principles over hype<span className="accent">.</span></h2><div className="principle-grid"><article><span>01</span><h3>Context first.</h3><p>No technology is universally right. Requirements, team maturity and operational cost matter.</p></article><article><span>02</span><h3>Build to learn.</h3><p>I keep coding and experimenting because hands-on feedback sharpens architectural decisions.</p></article><article><span>03</span><h3>Revisit decisions.</h3><p>Good choices evolve. This radar records a point of view, not an immutable verdict.</p></article></div></section>
- <footer><div><span className="brandmark">FC<span>·</span></span><p>Built with curiosity. Refined through practice.</p></div><a href="https://github.com/fcardone75/personal-tech-radar" target="_blank" rel="noreferrer">SOURCE ON GITHUB ↗</a><span>© 2026 FLAVIANO CARDONE</span></footer>
- {selected&&<div className="backdrop" onClick={()=>setSelected(null)}><div className="drawer" role="dialog" aria-modal="true" aria-label={selected.name} onClick={e=>e.stopPropagation()}><button className="close" aria-label="Close details" onClick={()=>setSelected(null)}>×</button><span className="section-index">TECHNOLOGY PROFILE</span><div className="drawer-symbol" style={{color:colors[selected.ring]}}>◎</div><h2>{selected.name}</h2><p className="drawer-category">{selected.quadrant}</p><div className="drawer-tags"><span style={{borderColor:colors[selected.ring],color:colors[selected.ring]}}>{selected.ring}</span><span>{selected.experience}</span></div><h3>My perspective</h3><p>{selected.note}</p><div className="draft-notice">This is an initial classification, pending detailed review and supporting examples.</div><button className="drawer-back" onClick={()=>setSelected(null)}>← Back to radar</button></div></div>}
- </main>
-}
-createRoot(document.getElementById("root")!).render(<React.StrictMode><App/></React.StrictMode>);
+import '@fontsource-variable/dm-sans';
+import '@fontsource-variable/space-grotesk';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
+import App from './App';
+import './style.css';
+
+const root = document.getElementById('root');
+if (!root) throw new Error('Missing #root element');
+
+createRoot(root).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+);

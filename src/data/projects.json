@@ -1,0 +1,38 @@
+[
+  {
+    "id": "saas",
+    "title": "Multi-tenant SaaS on Azure",
+    "description": "A multi-tenant SaaS platform on Azure. I lead the 6-person team.",
+    "years": "2022 – today"
+  },
+  {
+    "id": "babel",
+    "title": "BABEL",
+    "description": "An air-gapped, CPU-only on-prem AI platform for an institutional client.",
+    "years": "2026"
+  },
+  {
+    "id": "bc4e",
+    "title": "BC4E",
+    "description": "A multi-tenant e-learning and peer-assessment platform.",
+    "years": "2024 – 2026"
+  },
+  {
+    "id": "pass",
+    "title": "PASS",
+    "description": "A regulatory reporting platform for pension funds.",
+    "years": "2020 – 2026"
+  },
+  {
+    "id": "keq",
+    "title": "K-Equestre",
+    "description": "My own SaaS for riding schools.",
+    "years": null
+  },
+  {
+    "id": "daria",
+    "title": "DARIA",
+    "description": "An indoor air-quality IoT platform.",
+    "years": "In design"
+  }
+]

@@ -148,7 +148,7 @@ export const en: Strings = {
     intro:
       'My evolving perspective on the tools, platforms and ideas shaping how I build software. Built on experience, curiosity and engineering trade-offs.',
     role: 'Senior Cloud & AI Solution Architect and Technical Lead',
-    place: 'Chartered engineer, Rome',
+    place: 'Chartered engineer, Order of Engineers of Naples, no. 17141',
     explore: 'Explore the radar',
     source: 'View the source',
   },
@@ -293,7 +293,7 @@ export const it: Strings = {
     intro:
       'Il mio punto di vista, in continua evoluzione, su strumenti, piattaforme e idee che guidano il modo in cui costruisco software. Nato da esperienza, curiosità e compromessi ingegneristici.',
     role: 'Senior Cloud & AI Solution Architect e Technical Lead',
-    place: 'Ingegnere iscritto all’Albo, Roma',
+    place: 'Ingegnere iscritto all’Ordine di Napoli, n. 17141',
     explore: 'Esplora il radar',
     source: 'Vedi il sorgente',
   },
